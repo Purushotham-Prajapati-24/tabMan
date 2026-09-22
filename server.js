@@ -39,4 +39,9 @@ app.post("/api/tabs-relevance", async (req, res) => {
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Inbox triage running at http://localhost:${port}`));
+if (!process.env.VERCEL) {
+  app.listen(port, () => console.log(`Inbox triage running at http://localhost:${port}`));
+}
+
+export default app;
+

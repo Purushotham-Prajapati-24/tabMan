@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Tell it what you're working on; it finds the tabs related to that task and lets you close everything else in one click.",
   "permissions": ["tabs"],
-  "host_permissions": ["http://localhost/*"],
+  "host_permissions": ["http://localhost/*", "https://*.vercel.app/*"],
   "action": {
     "default_popup": "popup.html",
     "default_title": "Jev Tab Cleaner"

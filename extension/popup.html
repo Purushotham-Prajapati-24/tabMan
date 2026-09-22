@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Jev Tab Cleaner</title>
+<style>
+  body {
+    width: 360px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #0b0d10; color: #e8eaed; margin: 0; padding: 14px;
+  }
+  h1 { font-size: 1rem; margin: 0 0 8px; }
+  #server { font-size: 0.7rem; color: #9aa0a6; margin-bottom: 10px; }
+  #server input { width: 100%; box-sizing: border-box; margin-top: 3px; padding: 5px 7px;
+    border-radius: 6px; border: 1px solid #3c4043; background: #1a1c1e; color: #e8eaed; font-size: 0.75rem; }
+  textarea {
+    width: 100%; box-sizing: border-box; height: 56px; padding: 8px; font-size: 0.9rem;
+    border-radius: 8px; border: 1px solid #3c4043; background: #1a1c1e; color: #e8eaed; resize: vertical;
+  }
+  button {
+    margin-top: 8px; padding: 8px 14px; font-size: 0.9rem; border-radius: 8px;
+    border: none; background: #8ab4f8; color: #1a1c1e; font-weight: 600; cursor: pointer; width: 100%;
+  }
+  button:disabled { opacity: 0.5; cursor: default; }
+  button.danger { background: #f28b82; }
+  #status { font-size: 0.8rem; color: #9aa0a6; margin: 8px 0 4px; min-height: 1em; }
+  ul { list-style: none; padding: 0; margin: 8px 0; max-height: 260px; overflow-y: auto; }
+  li { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 1px solid #2a2d30; }
+  li .fav { width: 14px; height: 14px; margin-top: 3px; flex-shrink: 0; }
+  li .info { flex: 1; min-width: 0; }
+  li .title { font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  li .url { font-size: 0.7rem; color: #9aa0a6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  li .tag { font-size: 0.65rem; padding: 1px 6px; border-radius: 10px; flex-shrink: 0; margin-top: 2px; }
+  li .tag.keep { background: #1e3a2a; color: #81c995; }
+  li .tag.close { background: #3a1e1e; color: #f28b82; }
+  #summary { font-size: 0.8rem; margin: 6px 0; }
+  h2 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: #9aa0a6; margin: 10px 0 2px; }
+</style>
+</head>
+<body>
+  <h1>Jev Tab Cleaner</h1>
+
+  <details id="server">
+    <summary style="cursor:pointer;">Server URL</summary>
+    <input id="serverUrl" value="http://localhost:4173" />
+  </details>
+
+  <textarea id="task" placeholder="What are you working on right now? e.g. Debugging the checkout payment bug on the staging branch"></textarea>
+  <button id="scan">Find related tabs</button>
+  <div id="status"></div>
+  <div id="summary"></div>
+
+  <div id="closeSection" style="display:none">
+    <h2>To close</h2>
+    <ul id="closeList"></ul>
+    <button id="closeBtn" class="danger">Close unrelated tabs</button>
+  </div>
+
+  <div id="keepSection" style="display:none">
+    <h2>Keeping</h2>
+    <ul id="keepList"></ul>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

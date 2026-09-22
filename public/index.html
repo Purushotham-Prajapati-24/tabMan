@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Inbox Triage — powered by Jev</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    max-width: 720px; margin: 40px auto; padding: 0 20px;
+    background: #0b0d10; color: #e8eaed;
+  }
+  h1 { font-size: 1.3rem; margin-bottom: 4px; }
+  p.sub { color: #9aa0a6; margin-top: 0; }
+  textarea {
+    width: 100%; height: 120px; padding: 12px; font-size: 1rem;
+    border-radius: 8px; border: 1px solid #3c4043; background: #1a1c1e; color: #e8eaed;
+    box-sizing: border-box; resize: vertical;
+  }
+  button {
+    margin-top: 12px; padding: 10px 20px; font-size: 1rem; border-radius: 8px;
+    border: none; background: #8ab4f8; color: #1a1c1e; font-weight: 600; cursor: pointer;
+  }
+  button:disabled { opacity: 0.5; cursor: default; }
+  .card {
+    margin-top: 24px; padding: 18px; border-radius: 10px; background: #1a1c1e;
+    border: 1px solid #3c4043; display: none;
+  }
+  .row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #2a2d30; }
+  .row:last-child { border-bottom: none; }
+  .label { color: #9aa0a6; }
+  .priority { font-size: 1.1rem; font-weight: 700; padding: 10px 0; }
+  .bar { height: 6px; background: #2a2d30; border-radius: 4px; overflow: hidden; width: 140px; }
+  .bar > div { height: 100%; background: #8ab4f8; }
+  .examples { margin-top: 10px; font-size: 0.85rem; color: #9aa0a6; }
+  .examples span { text-decoration: underline; cursor: pointer; margin-right: 12px; }
+</style>
+</head>
+<body>
+  <h1>Inbox Triage</h1>
+  <p class="sub">Paste a customer message. One TypeSafe System One call routes it, scores urgency, and flags when a human needs to step in.</p>
+
+  <textarea id="message" placeholder="e.g. I've been charged twice for my subscription this month and support hasn't replied in three days. This is ridiculous, I want a refund now."></textarea>
+  <div class="examples">
+    Try:
+    <span onclick="fill(0)">angry billing complaint</span>
+    <span onclick="fill(1)">calm how-to question</span>
+    <span onclick="fill(2)">outage report</span>
+  </div>
+  <div><button id="go">Triage it</button></div>
+
+  <div class="card" id="card"></div>
+
+<script>
+const examples = [
+  "I've been charged twice for my subscription this month and support hasn't replied in three days. This is ridiculous, I want a refund now.",
+  "Hi, quick question — how do I export my data to CSV? No rush, just curious.",
+  "Our production dashboard has been down for 20 minutes and we're losing sales. Please help immediately!"
+];
+function fill(i) { document.getElementById('message').value = examples[i]; }
+
+const go = document.getElementById('go');
+const card = document.getElementById('card');
+
+go.addEventListener('click', async () => {
+  const message = document.getElementById('message').value.trim();
+  if (!message) return;
+  go.disabled = true; go.textContent = 'Thinking...';
+  card.style.display = 'none';
+  try {
+    const res = await fetch('/api/triage', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || data.error);
+    render(data);
+  } catch (e) {
+    card.style.display = 'block';
+    card.innerHTML = '<div style="color:#f28b82">Error: ' + e.message + '</div>';
+  } finally {
+    go.disabled = false; go.textContent = 'Triage it';
+  }
+});
+
+function pct(x) { return Math.round(x * 100) + '%'; }
+
+function render(d) {
+  card.style.display = 'block';
+  card.innerHTML = `
+    <div class="priority">${d.priority}</div>
+    <div class="row"><span class="label">Department</span><span>${d.department} (${pct(d.departmentConfidence)} confidence)</span></div>
+    <div class="row"><span class="label">Urgency</span><span>${d.urgencyLegend[Math.round(d.urgencyScore)]} (${d.urgencyScore.toFixed(2)}/4)</span></div>
+    <div class="row"><span class="label">Angry</span><span><div class="bar"><div style="width:${pct(d.angry)}"></div></div></span></div>
+    <div class="row"><span class="label">Churn risk</span><span><div class="bar"><div style="width:${pct(d.churnRisk)}"></div></div></span></div>
+    <div class="row"><span class="label">Needs human</span><span><div class="bar"><div style="width:${pct(d.needsHuman)}"></div></div></span></div>
+  `;
+}
+</script>
+</body>
+</html>

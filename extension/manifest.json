@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Jev Tab Cleaner",
+  "version": "1.0.0",
+  "description": "Tell it what you're working on; it finds the tabs related to that task and lets you close everything else in one click.",
+  "permissions": ["tabs"],
+  "host_permissions": ["http://localhost/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Jev Tab Cleaner"
+  }
+}

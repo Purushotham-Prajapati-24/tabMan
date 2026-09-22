@@ -4,6 +4,17 @@ const closeBtn = document.getElementById("closeBtn");
 const statusEl = document.getElementById("status");
 const summaryEl = document.getElementById("summary");
 const serverUrlEl = document.getElementById("serverUrl");
+try {
+  const savedServer = localStorage.getItem("tabman_server");
+  if (savedServer && Array.from(serverUrlEl.options).some((o) => o.value === savedServer)) {
+    serverUrlEl.value = savedServer;
+  }
+  serverUrlEl.addEventListener("change", () => {
+    localStorage.setItem("tabman_server", serverUrlEl.value);
+  });
+} catch {
+  // localStorage fallback
+}
 const closeSection = document.getElementById("closeSection");
 const keepSection = document.getElementById("keepSection");
 const closeList = document.getElementById("closeList");

@@ -12,6 +12,12 @@ const app = express();
 // origin, which is cross-origin from Express's point of view.
 app.use(cors());
 app.use(express.json({ limit: "1mb" }));
+app.use((req, res, next) => {
+  if (req.url.startsWith("/server.js")) {
+    req.url = req.url.replace(/^\/server\.js/, "") || "/";
+  }
+  next();
+});
 app.use(express.static(join(__dirname, "public")));
 
 app.get("/", (req, res) => {

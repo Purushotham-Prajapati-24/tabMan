@@ -3,7 +3,6 @@ import cors from "cors";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { existsSync } from "node:fs";
-import { triageTicket, decidePriority } from "./triage.js";
 import { scoreTabRelevance } from "./tab-relevance.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -23,25 +22,12 @@ app.get("/", (req, res) => {
   res.json({
     name: "Jev Tab Cleaner API",
     status: "running",
-    endpoints: ["/api/tabs-relevance", "/api/triage", "/api/health"]
+    endpoints: ["/api/tabs-relevance", "/api/health"]
   });
 });
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
-});
-
-app.post("/api/triage", async (req, res) => {
-  const message = (req.body?.message || "").trim();
-  if (!message) return res.status(422).json({ error: "message is required" });
-
-  try {
-    const result = await triageTicket(message);
-    res.json({ ...result, priority: decidePriority(result) });
-  } catch (err) {
-    console.error(err);
-    res.status(502).json({ error: "triage failed", detail: String(err?.message || err) });
-  }
 });
 
 app.post("/api/tabs-relevance", async (req, res) => {
@@ -61,7 +47,7 @@ app.post("/api/tabs-relevance", async (req, res) => {
 
 const port = process.env.PORT || 3000;
 if (!process.env.VERCEL) {
-  app.listen(port, () => console.log(`Inbox triage running at http://localhost:${port}`));
+  app.listen(port, () => console.log(`Jev Tab Cleaner API running at http://localhost:${port}`));
 }
 
 export default app;

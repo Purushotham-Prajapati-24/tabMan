@@ -3,100 +3,125 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Inbox Triage — powered by Jev</title>
+<title>Jev Tab Cleaner API</title>
 <style>
   :root { color-scheme: light dark; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    max-width: 720px; margin: 40px auto; padding: 0 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    max-width: 680px; margin: 40px auto; padding: 0 20px;
     background: #0b0d10; color: #e8eaed;
   }
-  h1 { font-size: 1.3rem; margin-bottom: 4px; }
-  p.sub { color: #9aa0a6; margin-top: 0; }
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  h1 { font-size: 1.4rem; margin: 0; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; font-size: 0.75rem; font-weight: 600;
+    border-radius: 999px; background: #1e3a2a; color: #81c995;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #81c995; }
+  p.sub { color: #9aa0a6; margin-top: 4px; font-size: 0.95rem; }
+  .card {
+    margin-top: 20px; padding: 20px; border-radius: 12px;
+    background: #1a1c1e; border: 1px solid #3c4043;
+  }
+  h2 { font-size: 1rem; margin-top: 0; margin-bottom: 12px; }
+  code {
+    background: #2a2d30; padding: 2px 6px; border-radius: 4px;
+    font-family: monospace; font-size: 0.85rem; color: #8ab4f8;
+  }
   textarea {
-    width: 100%; height: 120px; padding: 12px; font-size: 1rem;
-    border-radius: 8px; border: 1px solid #3c4043; background: #1a1c1e; color: #e8eaed;
-    box-sizing: border-box; resize: vertical;
+    width: 100%; height: 70px; padding: 10px; font-size: 0.9rem;
+    border-radius: 8px; border: 1px solid #3c4043; background: #121314; color: #e8eaed;
+    box-sizing: border-box; resize: vertical; margin-top: 6px;
   }
   button {
-    margin-top: 12px; padding: 10px 20px; font-size: 1rem; border-radius: 8px;
+    margin-top: 10px; padding: 8px 16px; font-size: 0.9rem; border-radius: 8px;
     border: none; background: #8ab4f8; color: #1a1c1e; font-weight: 600; cursor: pointer;
   }
   button:disabled { opacity: 0.5; cursor: default; }
-  .card {
-    margin-top: 24px; padding: 18px; border-radius: 10px; background: #1a1c1e;
-    border: 1px solid #3c4043; display: none;
-  }
-  .row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #2a2d30; }
-  .row:last-child { border-bottom: none; }
-  .label { color: #9aa0a6; }
-  .priority { font-size: 1.1rem; font-weight: 700; padding: 10px 0; }
-  .bar { height: 6px; background: #2a2d30; border-radius: 4px; overflow: hidden; width: 140px; }
-  .bar > div { height: 100%; background: #8ab4f8; }
-  .examples { margin-top: 10px; font-size: 0.85rem; color: #9aa0a6; }
-  .examples span { text-decoration: underline; cursor: pointer; margin-right: 12px; }
+  .results { margin-top: 14px; padding: 12px; border-radius: 8px; background: #121314; font-size: 0.85rem; display: none; }
+  .tab-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #2a2d30; }
+  .tab-row:last-child { border-bottom: none; }
+  .tag { padding: 2px 8px; border-radius: 6px; font-weight: 600; font-size: 0.75rem; }
+  .tag.keep { background: #1e3a2a; color: #81c995; }
+  .tag.close { background: #3a1e1e; color: #f28b82; }
+  .setup-list { margin: 8px 0 0 18px; padding: 0; color: #bdc1c6; font-size: 0.9rem; line-height: 1.5; }
 </style>
 </head>
 <body>
-  <h1>Inbox Triage</h1>
-  <p class="sub">Paste a customer message. One TypeSafe System One call routes it, scores urgency, and flags when a human needs to step in.</p>
-
-  <textarea id="message" placeholder="e.g. I've been charged twice for my subscription this month and support hasn't replied in three days. This is ridiculous, I want a refund now."></textarea>
-  <div class="examples">
-    Try:
-    <span onclick="fill(0)">angry billing complaint</span>
-    <span onclick="fill(1)">calm how-to question</span>
-    <span onclick="fill(2)">outage report</span>
+  <div class="header">
+    <h1>Jev Tab Cleaner API</h1>
+    <div class="badge"><div class="dot"></div> Online</div>
   </div>
-  <div><button id="go">Triage it</button></div>
+  <p class="sub">Backend service powered by TypeSafe Jev System One model to classify and clean browser tabs.</p>
 
-  <div class="card" id="card"></div>
+  <div class="card">
+    <h2>Chrome Extension Connection</h2>
+    <ol class="setup-list">
+      <li>Open your <strong>Jev Tab Cleaner</strong> Chrome extension popup.</li>
+      <li>Expand <strong>Server URL</strong>.</li>
+      <li>Paste this deployment URL: <code id="currentUrl">loading...</code></li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>Live API Test (<code>/api/tabs-relevance</code>)</h2>
+    <label style="font-size:0.85rem; color:#9aa0a6;">Test Task:</label>
+    <textarea id="task">Debugging Stripe webhook payment signature verification</textarea>
+    <button id="testBtn">Test with sample tabs</button>
+    <div id="results" class="results"></div>
+  </div>
 
 <script>
-const examples = [
-  "I've been charged twice for my subscription this month and support hasn't replied in three days. This is ridiculous, I want a refund now.",
-  "Hi, quick question — how do I export my data to CSV? No rush, just curious.",
-  "Our production dashboard has been down for 20 minutes and we're losing sales. Please help immediately!"
+document.getElementById("currentUrl").textContent = window.location.origin;
+
+const sampleTabs = [
+  { id: 1, title: "Stripe Docs - Webhook Verification", url: "https://stripe.com/docs/webhooks/signatures" },
+  { id: 2, title: "Reddit - Funny Videos & Memes", url: "https://reddit.com/r/funny" },
+  { id: 3, title: "GitHub - payments-service PR #12", url: "https://github.com/company/payments-service/pull/12" },
+  { id: 4, title: "Amazon - Wireless Headphones", url: "https://amazon.com/dp/B08N5WRWNW" }
 ];
-function fill(i) { document.getElementById('message').value = examples[i]; }
 
-const go = document.getElementById('go');
-const card = document.getElementById('card');
+const btn = document.getElementById("testBtn");
+const resBox = document.getElementById("results");
 
-go.addEventListener('click', async () => {
-  const message = document.getElementById('message').value.trim();
-  if (!message) return;
-  go.disabled = true; go.textContent = 'Thinking...';
-  card.style.display = 'none';
+btn.addEventListener("click", async () => {
+  const task = document.getElementById("task").value.trim();
+  if (!task) return;
+  btn.disabled = true;
+  btn.textContent = "Scoring with Jev...";
+  resBox.style.display = "none";
+
   try {
-    const res = await fetch('/api/triage', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message })
+    const res = await fetch("/api/tabs-relevance", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ task, tabs: sampleTabs })
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || data.error);
-    render(data);
-  } catch (e) {
-    card.style.display = 'block';
-    card.innerHTML = '<div style="color:#f28b82">Error: ' + e.message + '</div>';
+
+    resBox.style.display = "block";
+    resBox.innerHTML = "<strong>Classification Results:</strong><br><br>" +
+      data.results.map(t => `
+        <div class="tab-row">
+          <div>
+            <div>${t.title}</div>
+            <div style="font-size:0.75rem;color:#9aa0a6;">${t.url}</div>
+          </div>
+          <span class="tag ${t.keep ? 'keep' : 'close'}">
+            ${t.keep ? 'KEEP' : 'CLOSE'} (${Math.round(t.relevant * 100)}%)
+          </span>
+        </div>
+      `).join("");
+  } catch (err) {
+    resBox.style.display = "block";
+    resBox.innerHTML = '<span style="color:#f28b82;">Error: ' + err.message + '</span>';
   } finally {
-    go.disabled = false; go.textContent = 'Triage it';
+    btn.disabled = false;
+    btn.textContent = "Test with sample tabs";
   }
 });
-
-function pct(x) { return Math.round(x * 100) + '%'; }
-
-function render(d) {
-  card.style.display = 'block';
-  card.innerHTML = `
-    <div class="priority">${d.priority}</div>
-    <div class="row"><span class="label">Department</span><span>${d.department} (${pct(d.departmentConfidence)} confidence)</span></div>
-    <div class="row"><span class="label">Urgency</span><span>${d.urgencyLegend[Math.round(d.urgencyScore)]} (${d.urgencyScore.toFixed(2)}/4)</span></div>
-    <div class="row"><span class="label">Angry</span><span><div class="bar"><div style="width:${pct(d.angry)}"></div></div></span></div>
-    <div class="row"><span class="label">Churn risk</span><span><div class="bar"><div style="width:${pct(d.churnRisk)}"></div></div></span></div>
-    <div class="row"><span class="label">Needs human</span><span><div class="bar"><div style="width:${pct(d.needsHuman)}"></div></div></span></div>
-  `;
-}
 </script>
 </body>
 </html>

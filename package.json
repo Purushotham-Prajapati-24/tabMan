@@ -1,16 +1,25 @@
 {
-  "name": "jev",
+  "name": "tabman",
   "version": "1.0.0",
+  "description": "Context-aware Chrome extension powered by TypeSafe AI's Jev System One model to classify and clean unrelated browser tabs in one click.",
   "main": "server.js",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Purushotham-Prajapati-24/tabMan.git"
+  },
   "scripts": {
     "start": "node server.js",
     "test": "node test.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "chrome-extension",
+    "tab-manager",
+    "typesafe-ai",
+    "jev",
+    "system-one",
+    "productivity"
+  ],
   "dependencies": {
     "@typesafe-ai/sdk": "^0.6.0",
     "cors": "^2.8.6",
